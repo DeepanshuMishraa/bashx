@@ -193,21 +193,19 @@ fn main() {
             }
 
             // run the script from its directory
-            let output = std::process::Command::new("bash")
+            println!("Running script: {}", script_file.display());
+
+            let status = std::process::Command::new("bash")
                 .arg(&script_file)
                 .current_dir(script_dir)
-                .output();
+                .status();
 
-            match output {
-                Ok(output) => {
-                    if output.status.success() {
+            match status {
+                Ok(status) => {
+                    if status.success() {
                         println!("Script executed successfully.");
-                        println!("{}", String::from_utf8_lossy(&output.stdout));
                     } else {
-                        eprintln!(
-                            "Error executing script: {}",
-                            String::from_utf8_lossy(&output.stderr)
-                        );
+                        eprintln!("Script failed with exit code: {:?}", status.code());
                         std::process::exit(1);
                     }
                 }
