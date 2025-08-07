@@ -1,6 +1,10 @@
 [package]
-name = "bashx"
+name = "bpx"
 version = "0.1.0"
+authors = ["Deepanshu Mishra <hello@deepanshumishra.xyz>"]
+description = "Run bash scripts from GitHub with ease"
+license = "MIT"
+repository = "https://github.com/DeepanshuMishraa/bashx"
 edition = "2024"
 
 [dependencies]
