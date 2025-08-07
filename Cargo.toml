@@ -1,6 +1,6 @@
 [package]
 name = "bashx"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Deepanshu Mishra <hello@deepanshumishra.xyz>"]
 description = "Run bash scripts from GitHub with ease"
 license = "MIT"
