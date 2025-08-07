@@ -16,9 +16,7 @@ cargo build --release
 cargo install  bashx
 
 # Add to PATH (if not already configured)
-echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc  # for bash
-echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.zshrc   # for zsh
-source ~/.bashrc  # or source ~/.zshrc
+export PATH="$HOME/.cargo/bin:$PATH"
 ```
 
 ## Quick Start
