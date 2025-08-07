@@ -3,7 +3,7 @@ use walkdir::WalkDir;
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "bpx",
+    name = "bashx",
     version,
     about = "Run bash scripts from GitHub with ease"
 )]
@@ -38,7 +38,7 @@ fn main() {
 
             let clone_dir_path = dirs::home_dir()
                 .unwrap_or_default()
-                .join(".bpx")
+                .join(".bashx")
                 .join("cache");
 
             let clone_dir = clone_dir_path.to_str().unwrap_or_default();
@@ -73,12 +73,12 @@ fn main() {
             //Here we would list all the available scripts in the bpx dir
             let scripts_dir = dirs::home_dir()
                 .unwrap_or_default()
-                .join(".bpx")
+                .join(".bashx")
                 .join("cache");
 
             if !scripts_dir.exists() {
                 println!(
-                    "You have no scripts available. Please run `bpx get <url>` to add a script."
+                    "You have no scripts available. Please run `bashx get <url>` to add a script."
                 );
                 std::process::exit(0);
             }
@@ -105,7 +105,7 @@ fn main() {
             println!("Cleaning up scripts...");
             let cache_dir = dirs::home_dir()
                 .unwrap_or_default()
-                .join(".bpx")
+                .join(".bashx")
                 .join("cache");
             if cache_dir.exists() {
                 match std::fs::remove_dir_all(&cache_dir) {
@@ -123,7 +123,7 @@ fn main() {
             //run the script
             let cache_dir = dirs::home_dir()
                 .unwrap_or_default()
-                .join(".bpx")
+                .join(".bashx")
                 .join("cache");
 
             // recursively search for the script name in all directories
