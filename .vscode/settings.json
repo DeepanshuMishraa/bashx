@@ -1,0 +1,16 @@
+{
+  "a-file-icon-vscode.folderTheme": "classic",
+  "workbench.colorCustomizations": {
+    "tab.activeBorder": "#334139",
+    "titleBar.activeBackground": "#15231b",
+    "titleBar.activeForeground": "#fff",
+    "titleBar.inactiveBackground": "#15231b",
+    "titleBar.inactiveForeground": "#fff",
+    "statusBar.background": "#15231b",
+    "statusBar.foreground": "#fff",
+    "statusBarItem.hoverBackground": "#ffffff4D",
+    "statusBarItem.remoteBackground": "#334139",
+    "statusBarItem.remoteForeground": "#fff"
+  },
+  "coralize.color": "#15231b"
+}
