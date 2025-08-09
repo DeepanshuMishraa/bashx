@@ -1,4 +1,8 @@
+mod cache;
+mod command_executor;
 use ::clap::*;
+use cache::{clean_cache, get_cache_dir};
+use command_executor::{run_bash_script, run_git_clone, set_executable_permission};
 use walkdir::WalkDir;
 
 #[derive(Parser, Debug)]
@@ -36,53 +40,20 @@ fn main() {
                 std::process::exit(1);
             }
 
-            let clone_dir_path = dirs::home_dir()
-                .unwrap_or_default()
-                .join(".bashx")
-                .join("cache");
+            let clone_dir_path = get_cache_dir();
 
             let clone_dir = clone_dir_path.to_str().unwrap_or_default();
 
             println!("Cloning repository from {} into {}", url, clone_dir);
 
-            let output = std::process::Command::new("git")
-                .arg("clone")
-                .arg(url)
-                .arg(clone_dir)
-                .output();
-
-            match output {
-                Ok(output) => {
-                    if output.status.success() {
-                        println!("Repository cloned successfully.");
-                    } else {
-                        eprintln!(
-                            "Error cloning repository: {}",
-                            String::from_utf8_lossy(&output.stderr)
-                        );
-                        std::process::exit(1);
-                    }
-                }
-                Err(e) => {
-                    eprintln!("Failed to execute git command: {}", e);
-                    std::process::exit(1);
-                }
+            if let Err(e) = run_git_clone(url, clone_dir) {
+                eprintln!("Error cloning repository: {}", e);
+                std::process::exit(1);
             }
+            println!("Repository cloned successfully.");
         }
         Commands::List => {
-            //Here we would list all the available scripts in the bpx dir
-            let scripts_dir = dirs::home_dir()
-                .unwrap_or_default()
-                .join(".bashx")
-                .join("cache");
-
-            if !scripts_dir.exists() {
-                println!(
-                    "You have no scripts available. Please run `bashx get <url>` to add a script."
-                );
-                std::process::exit(0);
-            }
-
+            let scripts_dir = get_cache_dir();
             // only display .sh files in the cache directory and subdirectories
             let mut script_count = 0;
 
@@ -103,28 +74,16 @@ fn main() {
         }
         Commands::Clean => {
             println!("Cleaning up scripts...");
-            let cache_dir = dirs::home_dir()
-                .unwrap_or_default()
-                .join(".bashx")
-                .join("cache");
-            if cache_dir.exists() {
-                match std::fs::remove_dir_all(&cache_dir) {
-                    Ok(_) => println!("Cache directory cleaned successfully."),
-                    Err(e) => {
-                        eprintln!("Error cleaning cache directory: {}", e);
-                        std::process::exit(1);
-                    }
-                }
-            } else {
-                println!("No cache directory found to clean.");
+            if let Err(e) = clean_cache() {
+                eprintln!("Error cleaning cache: {}", e);
+                std::process::exit(1);
             }
+            println!("Cache cleaned successfully.");
+            std::process::exit(0);
         }
         Commands::Run { name } => {
             //run the script
-            let cache_dir = dirs::home_dir()
-                .unwrap_or_default()
-                .join(".bashx")
-                .join("cache");
+            let cache_dir = get_cache_dir();
 
             // recursively search for the script name in all directories
             let mut found_script: Option<std::path::PathBuf> = None;
@@ -172,48 +131,20 @@ fn main() {
             });
 
             // give chmod permissions to the script
-            let perm = std::process::Command::new("chmod")
-                .arg("+x")
-                .arg(&script_file)
-                .output();
-
-            match perm {
-                Ok(output) => {
-                    if output.status.success() {
-                        println!("Permissions set successfully. Running script...");
-                    } else {
-                        eprintln!("Error setting permissions");
-                        std::process::exit(1);
-                    }
-                }
-                Err(_) => {
-                    eprintln!("Failed to set permissions for the script.");
-                    std::process::exit(1);
-                }
+            if let Err(e) = set_executable_permission(&script_file) {
+                eprintln!("Error setting permissions: {}", e);
+                std::process::exit(1);
             }
-
             // run the script from its directory
             println!("Running script: {}", script_file.display());
 
-            let status = std::process::Command::new("bash")
-                .arg(&script_file)
-                .current_dir(script_dir)
-                .status();
-
-            match status {
-                Ok(status) => {
-                    if status.success() {
-                        println!("Script executed successfully.");
-                    } else {
-                        eprintln!("Script failed with exit code: {:?}", status.code());
-                        std::process::exit(1);
-                    }
-                }
-                Err(e) => {
-                    eprintln!("Failed to execute script: {}", e);
-                    std::process::exit(1);
-                }
+            if let Err(e) = run_bash_script(&script_file, script_dir) {
+                eprintln!("Error running script: {}", e);
+                std::process::exit(1);
+            } else {
+                println!("Script executed successfully.");
             }
+            std::process::exit(0);
         }
     }
 }
